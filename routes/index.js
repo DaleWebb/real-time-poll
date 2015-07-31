@@ -19,7 +19,7 @@ exports.poll = function(req, res) {
 	var pollId = req.params.id;
 	// Find the poll by its ID, use lean as we won't be changing it
 	var poll = db({ _id: parseInt(pollId)}).first();
-	
+
 		if(poll) {
 			var userVoted = false,
 					userChoice,
@@ -28,7 +28,7 @@ exports.poll = function(req, res) {
 			// Loop through poll choices to determine if user has voted
 			// on this poll, and if so, what they selected
 			for(c in poll.choices) {
-				var choice = poll.choices[c]; 
+				var choice = poll.choices[c];
 
 				for(v in choice.votes) {
 					var vote = choice.votes[v];
@@ -46,7 +46,7 @@ exports.poll = function(req, res) {
 			poll.userChoice = userChoice;
 
 			poll.totalVotes = totalVotes;
-		
+
 			res.json(poll);
 		} else {
 			res.json({error:true});
@@ -60,33 +60,33 @@ exports.create = function(req, res) {
 			choices = reqBody.choices.filter(function(v) { return v.text != ''; }),
 			// Build up poll object to save
 			pollObj = {_id: db().get().length+1, question: reqBody.question, choices: choices};
-				
+
 	// Create poll model from built up poll object
 	doc = db.insert(pollObj);
-	
+
 	res.json(doc);
 };
 
 exports.vote = function(socket) {
 	socket.on('send:vote', function(data) {
 		var ip = socket.handshake.headers['x-forwarded-for'] || socket.handshake.address.address;
-		
+
 		var poll = db({ _id: parseInt(data.poll_id)}).first();
-		
+
 			var choice = poll.choices[data.choice-1];
 			choice.votes.push({ ip: ip });
 			db(poll).remove();
 			db.merge(poll);
 			var doc = poll;
-				var theDoc = { 
-					question: doc.question, _id: doc._id, choices: doc.choices, 
-					userVoted: false, totalVotes: 0 
+				var theDoc = {
+					question: doc.question, _id: doc._id, choices: doc.choices,
+					userVoted: false, totalVotes: 0
 				};
 
 				// Loop through poll choices to determine if user has voted
 				// on this poll, and if so, what they selected
 				for(var i = 0, ln = doc.choices.length; i < ln; i++) {
-					var choice = doc.choices[i]; 
+					var choice = doc.choices[i];
 
 					for(var j = 0, jLn = choice.votes.length; j < jLn; j++) {
 						var vote = choice.votes[j];
@@ -99,8 +99,9 @@ exports.vote = function(socket) {
 						}
 					}
 				}
-				
+
 				socket.emit('myvote', theDoc);
+				delete theDoc.userChoice;
 				socket.broadcast.emit('vote', theDoc);
-			});			
+			});
 };
