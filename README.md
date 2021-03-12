@@ -2,7 +2,7 @@
 
 This application allows you to create polls - and enables users to vote on polls,
 with the results updating in real-time. The app accompanies the IBM developerWorks article
-[Building a real-time application with Node.js, AngularJS and MongoDB](http://www.ibm.com/developerworks/article_url_here).
+[Building a real-time application with Node.js, AngularJS and MongoDB](https://www.ibm.com/developerworks/library/wa-nodejs-polling-app/wa-nodejs-polling-app-pdf.pdf).
 
 I have modified the app to work without MongoDB, and instead use TaffyDB - "The JavaScript Database" 
 
